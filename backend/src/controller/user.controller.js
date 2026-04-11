@@ -1,5 +1,6 @@
 const { verifyMail } = require("../../Email/verifyMail");
 const userModel = require("../models/user.model");
+const sessionModel = require("../models/session.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -113,4 +114,76 @@ const verification = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verification };
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(40).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(402).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    }
+
+    if (user.isVerified !== true) {
+      return res.status(403).json({
+        success: false,
+        message: "Please verify your email before logging in",
+      });
+    }
+
+    const existingSession = await sessionModel.findOne({ userId: user._id });
+
+    // Checking Existing Session and Deleting it if Found
+    if (existingSession) {
+      await sessionModel.deleteOne({ userId: user._id });
+    }
+
+    // Create new Session for the User
+    await sessionModel.create({ userId: user._id });
+
+    // Generate Tokens for the User
+    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "10d",
+    });
+    const refreshtoken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
+
+    user.isLogin = true;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Welcome Back \`${user.username}\``,
+      accessToken,
+      refreshtoken,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { registerUser, verification, loginUser };
