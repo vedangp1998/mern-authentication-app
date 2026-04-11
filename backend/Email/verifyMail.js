@@ -1,8 +1,18 @@
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 dotenv.config();
+const fs = require("fs");
+const path = require("path");
+const handlebars = require("handlebars");
 
 const verifyMail = (token, email) => {
+  const emailTemplateSource = fs.readFileSync(
+    path.join(__dirname, "template.hbs"),
+    "utf-8",
+  );
+  const template = handlebars.compile(emailTemplateSource);
+  const htmlToSend = template({ token: encodeURIComponent(token) });
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -15,7 +25,7 @@ const verifyMail = (token, email) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Email Verification",
-    html: `<h1>Email Verification</h1>`,
+    html: htmlToSend,
   };
 
   transporter.sendMail(mailConfig, (error, info) => {
