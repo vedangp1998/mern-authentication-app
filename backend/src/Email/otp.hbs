@@ -1,0 +1,108 @@
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>OTP Verification</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .header h2 {
+        color: #333;
+      }
+
+      .message {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.6;
+        padding: 20px 0;
+      }
+
+      .otp-box {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .otp-code {
+        display: inline-block;
+        font-size: 36px;
+        font-weight: bold;
+        letter-spacing: 10px;
+        color: #ffffff;
+        background-color: #00a63d;
+        padding: 16px 32px;
+        border-radius: 8px;
+      }
+
+      .expiry {
+        text-align: center;
+        font-size: 14px;
+        color: #e53e3e;
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      .footer {
+        font-size: 13px;
+        color: #999;
+        text-align: center;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>OTP Verification</h2>
+      </div>
+      <div class="message">
+        <p>Hello,</p>
+        <p>
+          We received a request to verify your identity. Use the One-Time
+          Password (OTP) below to proceed. This OTP is valid for
+          <strong>10 minutes</strong>
+          only.
+        </p>
+
+        <div class="otp-box">
+          <span class="otp-code">{{otp}}</span>
+        </div>
+
+        <p class="expiry">⏳ This OTP will expire in 10 minutes.</p>
+
+        <p>
+          For your security, do
+          <strong>not share</strong>
+          this OTP with anyone. Our team will never ask you for this code.
+        </p>
+
+        <p>If you did not initiate this request, you can safely ignore this
+          email.</p>
+      </div>
+      <div class="footer">
+        &copy; 2025 Webelite Builders. All rights reserved.
+      </div>
+    </div>
+  </body>
+
+</html>
