@@ -186,4 +186,21 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verification, loginUser };
+const logoutUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+    await sessionModel.deleteMany({ userId });
+    await userModel.findByIdAndUpdate(userId, { isLogin: false });
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { registerUser, verification, loginUser, logoutUser };
