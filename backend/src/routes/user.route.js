@@ -11,5 +11,6 @@ router.post("/login", userController.loginUser);
 router.get("/logout", isAuthenticated, userController.logoutUser);
 router.post("/forgotpassword", userController.forgotPassword);
 router.post("/verify-otp/:email", userController.verifyOtp);
+router.post("/changePassword/:email", userController.changePassword);
 
 module.exports = router;

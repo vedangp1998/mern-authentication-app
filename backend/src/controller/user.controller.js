@@ -301,6 +301,60 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { newPassword, confirmPassword } = req.body;
+    const email = req.params.email;
+
+    if (!newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New Password and Confirm Password do not match",
+      });
+    }
+
+    if (newPassword.length < 6 || confirmPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = newHashedPassword;
+    await user.save();
+
+
+    return res.status(200).json({
+      success:true, 
+      message: "Password Changes Successfully "
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   verification,
@@ -308,4 +362,5 @@ module.exports = {
   logoutUser,
   forgotPassword,
   verifyOtp,
+  changePassword,
 };
