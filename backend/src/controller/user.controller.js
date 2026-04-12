@@ -2,7 +2,7 @@ const userModel = require("../models/user.model");
 const sessionModel = require("../models/session.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sendOtpMail = require("../Email/sendOtpMail");
+const { sendOtpMail } = require("../Email/sendOtpMail");
 const verifyMail = require("../Email/verifyMail");
 
 const registerUser = async (req, res) => {
@@ -244,10 +244,68 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+const verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const email = req.params.email;
+
+    if (!otp) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP is required",
+      });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (!user.otp || !user.otpExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP not generated or already verified",
+      });
+    }
+
+    if (user.otpExpiry < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired. Please request a new one",
+      });
+    }
+
+    if (otp !== user.otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    user.otp = null;
+    user.otpExpiry = null;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   verification,
   loginUser,
   logoutUser,
   forgotPassword,
+  verifyOtp,
 };

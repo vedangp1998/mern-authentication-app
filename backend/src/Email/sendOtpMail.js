@@ -1,13 +1,11 @@
 const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
-dotenv.config();
 const fs = require("fs");
 const path = require("path");
 const handlebars = require("handlebars");
 
-const sendOtpMail = (email, otp) => {
+const sendOtpMail = async (email, otp) => {
   const emailTemplateSource = fs.readFileSync(
-    path.join(__dirname, "template.hbs"),
+    path.join(__dirname, "otp.hbs"),
     "utf-8",
   );
   const template = handlebars.compile(emailTemplateSource);
@@ -24,17 +22,12 @@ const sendOtpMail = (email, otp) => {
   const mailConfig = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: "Otp for password reset",
+    subject: "OTP for Password Reset",
     html: htmlToSend,
   };
 
-  transporter.sendMail(mailConfig, (error, info) => {
-    if (error) {
-      console.error("Error sending email:", error);
-    } else {
-      console.log("Email sent:", info.messageId);
-    }
-  });
+  await transporter.sendMail(mailConfig);
+  console.log("Email sent to:", email);
 };
 
 module.exports = { sendOtpMail };
