@@ -3,7 +3,7 @@ const sessionModel = require("../models/session.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendOtpMail } = require("../Email/sendOtpMail");
-const verifyMail = require("../Email/verifyMail");
+const { verifyMail } = require("../Email/verifyMail");
 
 const registerUser = async (req, res) => {
   try {
