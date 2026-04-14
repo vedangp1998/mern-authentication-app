@@ -44,14 +44,25 @@ const Signup = () => {
           },
         }
       );
+
       if (res.data.success) {
-        navigate('/login');
+        navigate('/verify');
         toast.success(res.data.message);
       }
     } catch (err) {
-      console.log(err.message);
+      const message = err.response?.data?.message || 'Something went wrong';
+
+      if (message === 'User already exists') {
+        toast.error('Email is already registered. Please login.');
+      } else {
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
+
+      formData.email = '';
+      formData.password = '';
+      formData.username = '';
     }
   };
 
@@ -113,6 +124,7 @@ const Signup = () => {
                     variant="ghost"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    disable={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
